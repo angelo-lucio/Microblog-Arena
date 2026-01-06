@@ -22,6 +22,7 @@
   },
   "scripts": {
     "dev": "bun run src/app.ts",
-    "start": "bun run src/app.ts"
+    "start": "bun run src/app.ts",
+    "db:push": "drizzle-kit push"
   }
 }

@@ -10,10 +10,7 @@ bun install
 
 You can quickly run a PostgreSQL container for development using Docker:
 ```bash
-docker run --name my-postgres -p 5432:5432 \
-  -e POSTGRES_PASSWORD=supersecret123 \
-  -e POSTGRES_DB=minitwitter \
-  -d postgres
+docker run --name local-mini-db -p 5432:5432 -e POSTGRES_PASSWORD=supersecret123 -e POSTGRES_DB=minitwitter -d postgres
 ```
 
 
@@ -21,6 +18,7 @@ docker run --name my-postgres -p 5432:5432 \
 
 ```bash
 bun start dev
+npx drizzle-kit push 
 ```
 
 ## Kokilan dont forget to update readme for db schame migration
