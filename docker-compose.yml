@@ -3,18 +3,47 @@ services:
     image: postgres:16
     container_name: my-postgres
     restart: always
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: supersecret123
       POSTGRES_DB: minitwitter
-    ports:
-      - "5432:5432"
+    volumes:
+      - ./docker-data:/var/lib/postgresql/data
 
-  api:
-    build: .
-    ports:
-      - "3000:3000"
+  minitwitter-1:
+    build: .          # to build docker image with the Dockerfile in this directory
+    container_name: minitwitter-1
+
     environment:
-      DATABASE_URL: postgres://postgres:supersecret123@db:5432/minitwitter
+      DATABASE_URL: postgresql://postgres:supersecret123@db:5432/minitwitter
     depends_on:
-      - db
+      - db            # needed to start DB befor API
+    restart: always
+
+  minitwitter-2:
+    build: .          # to build docker image with the Dockerfile in this directory
+    container_name: minitwitter-2
+
+    environment:
+      DATABASE_URL: postgresql://postgres:supersecret123@db:5432/minitwitter
+    depends_on:
+      - db            # needed to start DB befor API
+    restart: always
+
+  load-balancer:
+    image: nginx:latest
+    container_name: load-balancer
+    restart: always
+    ports:
+      - "80:80"
+    volumes: 
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - minitwitter-1
+      - minitwitter-2
+
+
+volumes:
+  postgres_data:
