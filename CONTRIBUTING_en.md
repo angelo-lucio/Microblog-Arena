@@ -1,8 +1,8 @@
-#Coding Guidelines - Project Microblog
+# Coding Guidelines - Project Microblog
 
 To ensure code stability and smooth collaboration, please follow these rules.
 
-##Branching Policy
+# Branching Policy
 The **`main`** branch is strictly for stable backups and production-ready code.
 
 1.  **No Direct Pushes:** Direct pushes to `main` are forbidden.
@@ -13,11 +13,11 @@ The **`main`** branch is strictly for stable backups and production-ready code.
 
 
 
-##Docker & Database
+## Docker & Database
 * **Docker Compose:** Do not change shared ports (e.g., 5432) without consulting the team.
 * **Drizzle ORM:** If you change the schema, include the generated migrations in your commit so others can sync their local DBs.
 
-##Commit Messages
+## Commit Messages
 Simple convention:
 * `feat:` New features
 * `fix:` Bug fixes
