@@ -11,7 +11,7 @@ export let ollama: Ollama
 export const initializeOllama = async () => {
   if (ollama) return
   console.log('Initializing Ollama...')
-  const OLLAMA_HOST = process.env.OLLAMA_HOST || 'http://localhost:12434'
+  const OLLAMA_HOST = process.env.OLLAMA_HOST || 'http://ollamaforminitwitter:11434'
   console.log('Initializing Ollama with model:', OLLAMA_MODEL)
   console.log('Using Ollama host:', OLLAMA_HOST)
   ollama = new Ollama({
