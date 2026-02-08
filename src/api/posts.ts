@@ -2,6 +2,7 @@ import { type Express, type Request, type Response } from "express";
 import { postsTable } from "../db/schema";
 import { db } from "../database";
 import { and, eq } from "drizzle-orm";
+import { sentimentQueue } from "../message-broker/index.ts";
 
 export const initializePostsAPI = (app: Express) => {
     app.get("/hello-world", (req: Request, res: Response) => {
@@ -29,8 +30,18 @@ export const initializePostsAPI = (app: Express) => {
             res.status(400).send({ error: "Content is required" });
             return;
         }
-        const newPost = await db.insert(postsTable).values({ content, userId}).returning();
-        res.send(newPost[0]);
+        const [newPost]  = await db.insert(postsTable).values({ content, userId }).returning();
+
+        if (!newPost) {
+            res.status(500).send({ error: "Failed to create post" });
+            return;
+        }
+        
+        // send post to message broker for sentiment analysis
+        await sentimentQueue.add('analyze-sentiment', { postId: newPost.id })
+        console.log(`Post ${newPost.id} created and sent to message broker for sentiment analysis`) 
+
+        res.status(201).send(newPost);
     });
 
     app.put("/posts/:id", async (req: Request, res: Response) => {

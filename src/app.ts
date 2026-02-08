@@ -1,6 +1,7 @@
 import express, { type Request, type Response } from "express";
 import { initializeAPI } from "./api";
 import { initializeAuthAPI } from "./api/auth";
+import { initializeMessageBroker } from "./message-broker";
 
 const app = express();
 const port = 3000;
@@ -13,4 +14,5 @@ app.listen(port, () => {
 });
 
 initializeAPI(app);
-
+initializeAuthAPI(app);
+initializeMessageBroker();
