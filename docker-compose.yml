@@ -13,11 +13,15 @@ services:
       - ./docker-data:/var/lib/postgresql/data
 
   minitwitter-1:
+    image: minitwitter
     build: .          # to build docker image with the Dockerfile in this directory
     container_name: minitwitter-1
 
     environment:
       DATABASE_URL: postgresql://postgres:supersecret123@db:5432/minitwitter
+      REDIS_HOST: redis
+      OLLAMA_HOST: http://ollamaforminitwitter:11434
+      SERVER_ROLE: api
     depends_on:
         redis:        # needed to start Redis before API
           condition: service_healthy
@@ -26,12 +30,17 @@ services:
     restart: always
 
   minitwitter-2:
-    build: .          # to build docker image with the Dockerfile in this directory
+    image: minitwitter
     container_name: minitwitter-2
 
     environment:
       DATABASE_URL: postgresql://postgres:supersecret123@db:5432/minitwitter
+      REDIS_HOST: redis
+      OLLAMA_HOST: http://ollamaforminitwitter:11434
+      SERVER_ROLE: api
     depends_on:
+        minitwitter-1:
+          condition: service_started
         redis:        # needed to start Redis before API
           condition: service_healthy
         db:            # needed to start DB befor API
@@ -39,7 +48,7 @@ services:
     restart: always
 
   sentiment-worker:
-    build: .      
+    image: minitwitter
     container_name: sentiment-worker
     environment:
       DATABASE_URL: postgresql://postgres:supersecret123@db:5432/minitwitter
@@ -47,6 +56,8 @@ services:
       OLLAMA_HOST: http://ollamaforminitwitter:11434
       SERVER_ROLE: worker
     depends_on:
+      minitwitter-1:
+        condition: service_started
       redis:        # needed to start Redis before API
         condition: service_healthy
       db:            # needed to start DB befor API
