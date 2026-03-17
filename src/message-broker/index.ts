@@ -55,6 +55,21 @@ const analyzeSentiment = async (job: Job) => {
     logger.info(`Sentiment analysis for post ${postId} completed`)
 
     } catch (error) {
+        const maxAttempts = job.opts.attempts ?? 1
+        const isLastAttempt = job.attemptsMade + 1 >= maxAttempts
+
+        if (isLastAttempt) {
+            await db
+                .update(postsTable)
+                .set({
+                    sentiment: "error",
+                    correction: "AI moderation is temporarily unavailable. Please edit the post or retry later.",
+                })
+                .where(eq(postsTable.id, postId))
+            await invalidatePostsCache()
+            logger.warn(`Post ${postId} moved from pending to error after final retry`)
+        }
+
         logger.error(`Error analyzing sentiment for post ${postId}:`)
         throw error // rethrow error to let bullmq handle retries
     }

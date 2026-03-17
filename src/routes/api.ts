@@ -50,7 +50,12 @@ export const initializeAPI = (app: Express) => {
     }
     const [newPost] = await db
       .insert(postsTable)
-      .values({ content, userId })
+      .values({
+        content,
+        userId,
+        sentiment: "pending",
+        correction: "",
+      })
       .returning(); // returning the newly created post
 
     if (!newPost) {
@@ -60,7 +65,18 @@ export const initializeAPI = (app: Express) => {
     await invalidatePostsCache(); // Invalidate the posts cache after creating a new post to ensure cache consistency
 
     // send post to message broker for sentiment analysis
-    await sentimentQueue.add("analyze-sentiment", { postId: newPost.id });
+    await sentimentQueue.add(
+      "analyze-sentiment",
+      { postId: newPost.id },
+      {
+        attempts: 3,
+        backoff: {
+          type: "exponential",
+          delay: 2000,
+        },
+        removeOnComplete: true,
+      },
+    );
     logger.info(
       `Post ${newPost.id} created and sent to message broker for sentiment analysis`, 
     );
@@ -128,7 +144,18 @@ export const initializeAPI = (app: Express) => {
     await invalidatePostsCache(); // Invalidate the posts cache after updating a post to ensure cache consistency
 
     // resending post to message broker for sentiment analysis in case content changed
-    await sentimentQueue.add("analyze-sentiment", { content, postId });
+    await sentimentQueue.add(
+      "analyze-sentiment",
+      { postId },
+      {
+        attempts: 3,
+        backoff: {
+          type: "exponential",
+          delay: 2000,
+        },
+        removeOnComplete: true,
+      },
+    );
     logger.info(
       `Post ${ content } updated and sent to message broker for sentiment analysis`,
     );

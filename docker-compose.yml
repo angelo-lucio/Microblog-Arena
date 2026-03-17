@@ -17,6 +17,17 @@ services:
     volumes:
       - ./docker-data/postgres:/var/lib/postgresql
 
+  frontend:
+    build: ./frontend  #Dockerfile /frontend
+    container_name: vue
+    restart: always
+    ports:
+      - "4000:3000" # Map to port 4000
+    environment:
+      - NUXT_HOST=0.0.0.0 # acess from outside
+    depends_on:
+      - load-balancer
+
   minitwitter-1:
     build: .      
     image: minitwitter-app
