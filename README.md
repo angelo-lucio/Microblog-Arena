@@ -85,8 +85,9 @@ bunx drizzle-kit push
 Optionales AI-Modell laden:
 
 ```bash
-docker exec -it ollamaforminitwitter ollama pull llama3.2:1b // oder anderes beliebiges Modell
+docker exec -it ollamaforminitwitter ollama pull llama3.2:1b 
 ```
+oder ander beliebiges Modell
 
 ## Installation (lokale Entwicklung ohne Full Docker)
 
