@@ -47,7 +47,6 @@ export const getPosts = async (userId?: number) => {
 
 
 const getPostsFromCache = async () => {
-  const posts = await redis.get('posts') // Try to get all posts from cache
   if (!redis) {
     logger.debug('Redis client not initialized, cannot get posts from cache')
     return null; // If Redis client is not initialized, return null
@@ -60,7 +59,7 @@ const getPostsFromDB = async () => {
     id: postsTable.id,
     content: postsTable.content,
     userId: postsTable.userId,
-    authorName: usersTable.username,
+    username: usersTable.username,
     sentiment: postsTable.sentiment,
     correction: postsTable.correction,
   })

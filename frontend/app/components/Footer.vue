@@ -1,8 +1,8 @@
 <template>
-  <footer class="border-t-4 border-emerald-500 bg-slate-800 text-emerald-400">
-    <div class="max-w-6xl mx-auto p-4 w-full text-center">
-      <p class="text-sm font-mono">[MICROBLOG v2026 - GTA SAN ANDREAS EDITION]</p>
-      <p class="text-xs font-mono text-cyan-300 mt-2">- THE OG RETRO SOCIAL NETWORK -</p>
+  <footer class="relative border-t border-cyan-500/70 bg-slate-900/95 text-cyan-100">
+    <div class="mx-auto flex w-full max-w-[1500px] flex-wrap items-center justify-between gap-2 px-4 py-3 text-xs uppercase tracking-wide md:px-6">
+      <p class="text-emerald-300">Microblog Arena v2026</p>
+      <p class="text-cyan-300">Live Feed | AI Guard | Community Mode</p>
     </div>
   </footer>
 </template>

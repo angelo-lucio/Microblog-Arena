@@ -4,6 +4,7 @@ import { textAnalysis } from "../microservices/ai"
 import { postsTable } from "../db/schema"
 import { db } from "../db/database.ts"
 import { logger } from "../microservices/logger.ts" 
+import { invalidatePostsCache } from "../microservices/cache.ts"
 
 export let sentimentQueue: Queue
 let sentimentWorker: Worker
@@ -50,9 +51,25 @@ const analyzeSentiment = async (job: Job) => {
 
     // update post with sentiment analysis result
     await db.update(postsTable).set({ sentiment: safeSentiment, correction: safeCorrection }).where(eq(postsTable.id, postId))
+    await invalidatePostsCache()
     logger.info(`Sentiment analysis for post ${postId} completed`)
 
     } catch (error) {
+        const maxAttempts = job.opts.attempts ?? 1
+        const isLastAttempt = job.attemptsMade + 1 >= maxAttempts
+
+        if (isLastAttempt) {
+            await db
+                .update(postsTable)
+                .set({
+                    sentiment: "error",
+                    correction: "AI moderation is temporarily unavailable. Please edit the post or retry later.",
+                })
+                .where(eq(postsTable.id, postId))
+            await invalidatePostsCache()
+            logger.warn(`Post ${postId} moved from pending to error after final retry`)
+        }
+
         logger.error(`Error analyzing sentiment for post ${postId}:`)
         throw error // rethrow error to let bullmq handle retries
     }
