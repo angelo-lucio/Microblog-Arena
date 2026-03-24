@@ -73,7 +73,6 @@ docker compose up -d --build
 ```bash
 bunx drizzle-kit push
 ```
-(mit "docker compose up -d --build" ist es automatisiert)
 
 4. Anwendung oeffnen:
 
